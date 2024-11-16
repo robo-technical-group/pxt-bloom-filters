@@ -1,6 +1,6 @@
 namespace WordLists {
     //% fixedInstance
-    //% block="z Empty Filter"
+    //% block="Empty Filter" weight=0
     export let zEmptyFilter: Bloom = new Bloom(null)
     
     //% block
