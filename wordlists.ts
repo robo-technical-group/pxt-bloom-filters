@@ -1,9 +1,9 @@
 namespace WordLists {
     //% fixedInstance
-    export const EmptyFilter: Bloom = new Bloom(null)
+    export let EmptyFilter: Bloom = new Bloom(null)
     
     //% block
-    export function isWordInFilter(b: Bloom, w: string): number {
-        return 0
+    export function isWordInFilter(filter: Bloom, word: string): boolean {
+        return filter.findWord(word)
     }
 }
