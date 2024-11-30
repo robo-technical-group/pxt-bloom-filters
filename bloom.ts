@@ -1,3 +1,5 @@
+// TODO: Support multilingual filters.
+
 interface BloomFilter {
     n: number,
     m: number,
@@ -13,8 +15,11 @@ interface BloomFilter {
 //% blockNamespace=WordLists
 class Bloom {
     private _filters: BloomFilter[]
-    constructor(filters: BloomFilter[]) {
+    private _isUpperCase: boolean
+
+    constructor(filters: BloomFilter[], forceUpperCase: boolean = true) {
         this._filters = filters
+        this._isUpperCase = forceUpperCase
     }
 
     public static fromFilterSet(filters: BloomFilter[]): Bloom {
@@ -24,7 +29,11 @@ class Bloom {
     public findWord(word: string): boolean {
         if (this._filters == null) { return false }
         if (!this._filters[word.length]) { return false }
-        const value: BigNum.BigInt = this.getWordValue(word)
+        const value: BigNum.BigInt = this.getWordValue(
+            this._isUpperCase ?
+            word.toUpperCase() :
+            word.toLowerCase()
+        )
         const k: number = this._filters[word.length].k
         for (let i: number = 0; i < k; i++) {
             if (!this.getFilterBit(this.getHashForWordValue(value, word.length, i), word.length)) {
@@ -58,9 +67,8 @@ class Bloom {
     }
 
     protected getWordValue(word: string): BigNum.BigInt {
-        const ucWord: string = word.toUpperCase()
         let toReturn: BigNum.BigInt = BigNum.CreateBigInt(0)
-        for (let c of ucWord) {
+        for (let c of word) {
             // toReturn = (toReturn << 5) + c.charCodeAt(0) - 'A'.charCodeAt(0)
             toReturn = toReturn.leftShift(5).add(c.charCodeAt(0)).subtract('A'.charCodeAt(0))
         }
