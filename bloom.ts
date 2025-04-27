@@ -14,12 +14,24 @@ interface BloomFilter {
 //% fixedInstances
 //% blockNamespace=WordLists
 class Bloom {
+    private _alpha: string
+    private _blockBits: number
     private _filters: BloomFilter[]
     private _isUpperCase: boolean
+    private _radix: number
 
-    constructor(filters: BloomFilter[], forceUpperCase: boolean = true) {
+    constructor(
+        filters: BloomFilter[],
+        forceUpperCase: boolean = true,
+        radix: number = 64,
+        blockBits: number = 24,
+        alpha: string = null
+    ) {
         this._filters = filters
         this._isUpperCase = forceUpperCase
+        this._radix = radix
+        this._blockBits = blockBits
+        this._alpha = alpha
     }
 
     public static fromFilterSet(filters: BloomFilter[]): Bloom {
@@ -44,8 +56,8 @@ class Bloom {
     }
 
     protected getFilterBit(location: number, wordLength: number): boolean {
-        const blockNum: number = Math.floor(location / 24)
-        const byteNum: number = Math.floor((location % 24) / 8)
+        const blockNum: number = Math.floor(location / this._blockBits)
+        const byteNum: number = Math.floor((location % this._blockBits) / 8)
         const bitNum: number = location % 8
         const block: string = this._filters[wordLength].filter.substr(blockNum * 4, 4)
         const byte: number = Buffer.fromBase64(block).getUint8(byteNum)
